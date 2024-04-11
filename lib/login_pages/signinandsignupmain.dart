@@ -5,6 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+import 'user_registered.dart';
+
 class Signinandsignupmain extends StatelessWidget {
   final List<imageModel> data;
   const Signinandsignupmain({Key? key, required this.data}) : super(key: key);
@@ -98,7 +100,7 @@ class Signinandsignupmain extends StatelessWidget {
                                             )),
                                   );
                                 },
-                                child: Row(
+                                child: const Row(
                                   children: [
                                     Text(
                                       "Sign In",
@@ -114,12 +116,10 @@ class Signinandsignupmain extends StatelessWidget {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => signup(
-                                          data: [],
-                                        )),
+                                        builder: (context) => Userregistration(data: [],)),
                                   );
                                 },
-                                child: Row(
+                                child: const Row(
                                   children: [
                                     Text(
                                       "Sign Up",

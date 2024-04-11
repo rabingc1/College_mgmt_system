@@ -1,15 +1,18 @@
+
+
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:internship/pages/setting.dart';
 
 
-class fetchdata extends StatefulWidget {
+class userinformation extends StatefulWidget {
   @override
   _UserDataScreenState createState() => _UserDataScreenState();
 }
 
-class _UserDataScreenState extends State<fetchdata> {
+class _UserDataScreenState extends State<userinformation> {
   late User _user; // Firebase user object
   late Stream<DocumentSnapshot> _userStream; // Firestore document stream
 
@@ -48,19 +51,26 @@ class _UserDataScreenState extends State<fetchdata> {
           Map<String, dynamic> userData = snapshot.data!.data() as Map<String, dynamic>;
           String name = userData['name'] ?? '';
           String email = userData['email'] ?? '';
+          String address= userData['Address']?? '';
 
           return
             Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Name: $name', style: TextStyle(fontSize: 18)),
-                SizedBox(height: 10),
-                Text('Email: $email', style: TextStyle(fontSize: 18)),
-              ],
-            ),
-          );
+              padding: const EdgeInsets.all(12.0),
+              child: Container(
+                margin: const EdgeInsets.all(5),
+                height: MediaQuery.of(context).size.height,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Name: $name', style: TextStyle(fontSize: 18)),
+                    SizedBox(height: 10),
+                    Text('Email: $email', style: TextStyle(fontSize: 18)),
+                    SizedBox(height: 10),
+                    Text('Address: $address', style: TextStyle(fontSize: 18)),
+                  ],
+                ),
+              ),
+            );
         },
       ),
     );

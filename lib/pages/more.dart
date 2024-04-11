@@ -1,9 +1,11 @@
+import 'package:internship/homepage.dart';
 import 'package:internship/pages/result.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:internship/pages/setting.dart';
 
 import '../model.dart';
+import '../settingpage/form.dart';
 import 'academicInfo.dart';
 import 'assignment.dart';
 import 'event.dart';
@@ -36,7 +38,7 @@ class more extends StatelessWidget {
                       // Navigate to the new page route when tapped
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => academicinfo()),
+                        MaterialPageRoute(builder: (context) => academicinfo(data: model,)),
                       );
                     },
                     child: Container(
@@ -75,7 +77,7 @@ class more extends StatelessWidget {
                       // Navigate to the new page route when tapped
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => assignment()),
+                        MaterialPageRoute(builder: (context) => result()),
                       );
                     },
                     child: Container(// this is for Assignment---------------------------------------------------------------------------------
@@ -150,7 +152,7 @@ class more extends StatelessWidget {
                       // Navigate to the new page route when tapped
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => faculty()),
+                        MaterialPageRoute(builder: (context) => fetchdata()),
                       );
                     },
                     child: Container(// this is for Faculty---------------------------------------------------------------------------------------
@@ -225,7 +227,7 @@ class more extends StatelessWidget {
                       // Navigate to the new page route when tapped
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => result()),
+                        MaterialPageRoute(builder: (context) => FormScreen(data: model)),
                       );
                     },
                     child: Container(// this is for Result--------------------------------------------------------------------------------------
@@ -251,7 +253,7 @@ class more extends StatelessWidget {
                           Image.asset(
                               height: 60, color: Colors.green, model[10].image),
                           Text(
-                            "Assignment",
+                            "Attendance",
                             style: TextStyle(fontWeight: FontWeight.bold),
                           )
                         ],

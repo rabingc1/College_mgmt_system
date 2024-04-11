@@ -9,9 +9,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:vibration/vibration.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
+import '../fetchdata.dart';
 import '../model.dart';
 import '../user_auth/firebase_auth_services.dart';
+import 'user_registered.dart';
+import 'forgot_password.dart';
 
 class signin extends StatefulWidget {
   final List<imageModel> data;
@@ -27,12 +30,14 @@ class _signinState extends State<signin> {
 
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -136,7 +141,9 @@ class _signinState extends State<signin> {
                                     print('Form validation failed');
                                   }
                                 },
-                                child: Text('Submit'),
+                                child: _isLoading
+                                    ? CircularProgressIndicator()
+                                    :Text('Submit'),
                               ),
                               TextButton(
                                   onPressed: () {
@@ -144,7 +151,7 @@ class _signinState extends State<signin> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              homepage(data: widget.data)),
+                                              ForgotPasswordScreen()),
                                     );
                                   },
                                   child: const Text(
@@ -154,22 +161,43 @@ class _signinState extends State<signin> {
                                         fontWeight: FontWeight.bold,
                                         decoration: TextDecoration.underline),
                                   )),
+
                               TextButton(
                                   onPressed: () {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              signup(data: widget.data)),
+                                              Userregistration(data: widget.data)),
                                     );
                                   },
-                                  child: Text(
-                                    "New Registration",
+                                  child: const Text(
+                                    "User Registration",
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                         decoration: TextDecoration.underline),
                                   )),
+
+
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              fetchdata()),
+                                    );
+                                  },
+                                  child: const Text(
+                                    "fetchdata",
+                                    style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                        decoration: TextDecoration.underline),
+                                  )),
+
+
                             ],
                           ),
                         ),
@@ -186,6 +214,9 @@ class _signinState extends State<signin> {
   }
 
   Future<void> _signin(BuildContext context) async {
+    setState(() {
+      _isLoading = true; // Set loading state to true
+    });
 
     String email = _emailController.text;
     String password = _passwordController.text;
@@ -196,6 +227,8 @@ class _signinState extends State<signin> {
         email: email,
         password: password,
       );
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('tempEmail', email);
 
       if (userCredential.user != null) {
         ScaffoldMessenger.of(context).showSnackBar(

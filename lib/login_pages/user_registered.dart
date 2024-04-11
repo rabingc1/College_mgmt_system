@@ -1,39 +1,98 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:internship/homepage.dart';
-import 'package:internship/login_pages/sign_in.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:internship/login_pages/sign_in.dart';
+import 'package:internship/model.dart';
 
-import '../model.dart';
-import '../user_auth/firebase_auth_services.dart';
-
-/*class signup extends StatefulWidget {
-  final List<imageModel> data;
-  const signup({Key? key, required this.data}) : super(key: key);
+class Userregistration extends StatefulWidget {
+  const Userregistration({super.key, required List<imageModel> data});
 
   @override
-  State<signup> createState() => _signinState();
-}*/
+  State<Userregistration> createState() => _UserregistrationState();
+}
 
-/*class _signinState extends State<signup> {
+class _UserregistrationState extends State<Userregistration> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-
-  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
+  bool _isLoading = false;
+  Future<void> _registerUserAndCreateFirestoreDocument() async {
+    setState(() {
+      _isLoading = true; // Set loading state to true
+    });
 
-  final FirebaseauthService _auth = FirebaseauthService();
+    try {
+      // Register the user with email and password using Firebase Authentication
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
 
-  @override
-  void dispose(){
-    _usernameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
+      // Access the newly created user
+      User? user = userCredential.user;
+
+      // Create a new document in Firestore for the user
+      if (user != null) {
+
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user!.uid)
+            .set({
+          'name': _nameController.text.trim(),
+          'email': _emailController.text.trim(),
+          // You can add more fields as needed
+
+        });
+
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  signin(data: model)), // Navigate to SignInPage
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('User is successfully signed in  ',
+                  style: TextStyle(color: Colors.white)),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+            ));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              behavior: SnackBarBehavior.fixed,
+              content: Text(
+                  'User is not registered, Please registered to get start!!',
+                  style: TextStyle(color: Colors.white, fontSize: 13.5)),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 5),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20)))),
+        );
+
+        print("Error: user registration failed");
+      }
+    } catch (error) {
+      print('Error registering user and creating Firestore document: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            behavior: SnackBarBehavior.fixed,
+            content: Text(
+                'User is not registered, Please registered to get start!!',
+                style: TextStyle(color: Colors.white, fontSize: 13.5)),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 5),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20)))),
+      );
+    }
   }
 
   @override
@@ -70,27 +129,24 @@ import '../user_auth/firebase_auth_services.dart';
                                 child: Text(
                                   "Sign Up",
                                   style: TextStyle(
-                                      fontSize: 20, fontWeight: FontWeight.bold),
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
                                 )),
                             TextFormField(
-                              controller: _usernameController,
-
+                              controller: _nameController,
                               decoration: const InputDecoration(
                                   focusColor: Colors.orangeAccent,
                                   border: OutlineInputBorder(),
                                   labelText: 'Enter Full Name',
                                   prefixIcon: Icon(Icons.text_format)),
-                              validator: (value){
-                                if(value==null|| value.isEmpty){
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
                                   return 'please enter you full name';
                                 }
                               },
-                              onSaved: (value) {
-      
-                              },
+                              onSaved: (value) {},
                             ),
                             Text(""),
-      
                             TextFormField(
                               controller: _emailController,
                               decoration: const InputDecoration(
@@ -110,9 +166,7 @@ import '../user_auth/firebase_auth_services.dart';
                                 }
                                 return null;
                               },
-                              onSaved: (value) {
-      
-                              },
+                              onSaved: (value) {},
                             ),
                             Text(""),
                             TextFormField(
@@ -131,38 +185,44 @@ import '../user_auth/firebase_auth_services.dart';
                                 }
                                 return null;
                               },
-                              onSaved: (value) {
-      
-                              },
+                              onSaved: (value) {},
                             ),
                             Text(""),
-
-
-                          *//*  ElevatedButton(
+                            ElevatedButton(
                               onPressed: () {
-                                _signup();
                                 if (_formKey.currentState!.validate()) {
+                                  _registerUserAndCreateFirestoreDocument();
+                                }
+                              },
+                              child:
+                              _isLoading
+                                  ? CircularProgressIndicator()
+                             : Text('Register'),
+                            ),
+
+                            /* ElevatedButton(
+                              onPressed: () {
+                                _registerUserAndCreateFirestoreDocument;
+                                if (_formKey.currentState!.validate()) {
+
                                   _formKey.currentState!.save();
                                   // Form is validated, do something with the data
 
-      
                                   // Navigate to the next page here
                                 } else {
                                   // Form validation failed
-
                                 }
                               },
                               child: Text('Submit'),
-                            ),*//*
+                            ),*/
                             TextButton(
                                 onPressed: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                            signin(data: widget.data)),
+                                            signin(data: model)),
                                   );
-      
                                 },
                                 child: Text(
                                   "Back To Sign In",
@@ -184,31 +244,4 @@ import '../user_auth/firebase_auth_services.dart';
       ),
     );
   }
-
-
-  void _signup() async {
-    String username = _usernameController.text;
-    String email = _emailController.text;
-    String password = _passwordController.text;
-
-
-
-    User? user = await _auth.signUpWithEmailAndAndPassword(email,password);
-    if(user!=null){
-      print("user is registered");
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => signin(data: model)),
-      );
-    }else{
-      print("email is already in used or check it once");
-    }
-
-  }
-
-
-
-
-
-
-}*/
+}

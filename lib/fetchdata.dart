@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:internship/pages/setting.dart';
-
 
 class fetchdata extends StatefulWidget {
   @override
@@ -49,8 +47,7 @@ class _UserDataScreenState extends State<fetchdata> {
           String name = userData['name'] ?? '';
           String email = userData['email'] ?? '';
 
-          return
-            Padding(
+          return Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,7 +62,4 @@ class _UserDataScreenState extends State<fetchdata> {
       ),
     );
   }
-
-
-
 }

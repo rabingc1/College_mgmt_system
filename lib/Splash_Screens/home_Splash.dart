@@ -43,7 +43,7 @@ class _first_SplashState extends State<first_Splash> {
                         builder: (context) => Signinandsignupmain(data: model)),
                   );
                 },
-                child: Text("Skip"),
+                child: Text("Skip",style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
               ),
               SmoothPageIndicator(controller: _controller, count: 3),
               GestureDetector(
@@ -64,7 +64,7 @@ class _first_SplashState extends State<first_Splash> {
                     );
                   }
                 },
-                child: Text("Next"),
+                child: Text("Next",style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold)),
               ),
             ],
           ),

@@ -1,6 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:internship/model.dart';
 import 'package:internship/pages/academicInfo.dart';
 import 'package:internship/pages/assignment.dart';
+import 'package:internship/pages/assignment_submit_page/Assignment_submit_page.dart';
 import 'package:internship/pages/event.dart';
 import 'package:internship/pages/faculty.dart';
 import 'package:internship/pages/more.dart';
@@ -8,19 +12,40 @@ import 'package:internship/pages/result.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-
 import 'exit_dialog_box_controller.dart';
 import 'login_pages/sign_in.dart';
 import 'model.dart';
-
-class homepage extends StatelessWidget {
+import 'package:cloud_firestore/cloud_firestore.dart';
+class homepage extends StatefulWidget {
   const homepage({super.key, required List<imageModel> data});
+
+  @override
+
+  State<homepage> createState() => _homepageState();
+}
+
+class _homepageState extends State<homepage> {
+  late User _user; // Firebase user object
+  late Stream<DocumentSnapshot> _userStream; // Firestore document stream
+
+  @override
+  void initState() {
+    super.initState();
+    _user = FirebaseAuth.instance.currentUser!; // Get current authenticated user
+    _userStream = FirebaseFirestore.instance
+        .collection('users')
+        .doc(_user.uid)
+        .snapshots(); // Firestore stream for user document
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
 
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.blue,
       ),
       body: WillPopScope(
@@ -32,70 +57,74 @@ class homepage extends StatelessWidget {
         },
         child: Column(children: [
           Container(
-              height: 150,
-              width: 500,
-              // width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                color: Colors.blue, // Example color
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.zero,
-                    topRight: Radius.zero,
-                    bottomLeft: Radius.circular(10),
-                    bottomRight: Radius.circular(
-                        90)),
+            height: 150,
+            width: 500,
+            decoration: BoxDecoration(
+              color: Colors.blue,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.zero,
+                topRight: Radius.zero,
+                bottomLeft: Radius.circular(10),
+                bottomRight: Radius.circular(90),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 50,
-                        child: Icon(
-                          Icons.account_circle,
-                          size: 50,
-                        ),
+            ),
+            child: StreamBuilder<DocumentSnapshot>(
+              stream: _userStream,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                }
+
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+
+                if (!snapshot.hasData || snapshot.data!.data() == null) {
+                  return Center(child: Text('User data not found'));
+                }
+
+                String userName = snapshot.data!.get('name') ?? 'Unknown';
+
+                return Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 50,
+                      child: Icon(
+                        Icons.account_circle,
+                        size: 50,
                       ),
-
-
-
-
-                      Container(
-                        width: 200,
-                        child: const Column(
-                          children: [
-                            Align(
-                                alignment: Alignment.topLeft,
-                                child: Text(
-                                  "  Ram",
-                                  style: TextStyle(color: Colors.white),
-                                )),
-                            Align(
-                              alignment: Alignment.topLeft,
-                              child: Text("  BCA 7th Semester",
-                                  style: TextStyle(color: Colors.white)),
-                            ),
-                            Align(
-                              alignment: Alignment.topLeft,
-                              child: Text("  Tribhuvan University",
-                                  style: TextStyle(color: Colors.white)),
-                            ),
-                            Align(
-                              alignment: Alignment.topLeft,
-                              child: Text("  0000120",
-                                  style: TextStyle(
-                                      color: Colors.redAccent,
-                                      fontWeight: FontWeight.bold)),
-                            ),
-                          ],
+                    ),
+                    SizedBox(width: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          userName,
+                          style: TextStyle(color: Colors.white),
                         ),
-                      ),
-
-                    ],
-                  ),
-                ],
-              )),//This is for titel page
+                        Text(
+                          "BCA 7th Semester",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        Text(
+                          "Tribhuvan University",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        Text(
+                          "0000120",
+                          style: TextStyle(
+                            color: Colors.redAccent,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),//This is for titel page
           Container(    //this is for Academic Information----------------------------------------------------------
               height: 280,
               width: MediaQuery.of(context).size.width,
@@ -108,11 +137,9 @@ class homepage extends StatelessWidget {
                 children: <Widget>[
                    GestureDetector(
                      onTap: () {
+
                        // Navigate to the new page route when tapped
-                       Navigator.push(
-                         context,
-                         MaterialPageRoute(builder: (context) => academicinfo()),
-                       );
+                       Get.toNamed('/academicinfo');
                      },
                     child: Container(
                       padding: const EdgeInsets.all(10),
@@ -150,7 +177,7 @@ class homepage extends StatelessWidget {
                       // Navigate to the new page route when tapped
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => assignment()),
+                        MaterialPageRoute(builder: (context) => Assignment_submit_page()),
                       );
                     },
                     child: Container(// this is for Assignment---------------------------------------------------------------------------------
@@ -225,7 +252,7 @@ class homepage extends StatelessWidget {
                        // Navigate to the new page route when tapped
                        Navigator.push(
                          context,
-                         MaterialPageRoute(builder: (context) => faculty()),
+                         MaterialPageRoute(builder: (context) => fetchdata()),
                        );
                      },
                     child: Container(// this is for Faculty---------------------------------------------------------------------------------------
@@ -249,7 +276,7 @@ class homepage extends StatelessWidget {
                       child: Column(
                         children: [
                           Image.asset(height: 60,color: Colors.green, model[6].image),
-                          Text(
+                          const Text(
                             "Faculty",
                             style: TextStyle(fontWeight: FontWeight.bold),
                           )
@@ -269,7 +296,7 @@ class homepage extends StatelessWidget {
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.only(
+                        borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(20),
                             topRight: Radius.circular(20),
                             bottomLeft: Radius.circular(20),
@@ -287,7 +314,7 @@ class homepage extends StatelessWidget {
                         children: [
                           Image.asset(
                               height: 60, color: Colors.green, model[4].image),
-                          Text(
+                          const Text(
                             "Result",
                             style: TextStyle(fontWeight: FontWeight.bold),
                           )
@@ -307,7 +334,7 @@ class homepage extends StatelessWidget {
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.only(
+                        borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(20),
                             topRight: Radius.circular(20),
                             bottomLeft: Radius.circular(20),
@@ -325,7 +352,7 @@ class homepage extends StatelessWidget {
                         children: [
                           Image.asset(
                               height: 60, color: Colors.green, model[9].image),
-                          Text(
+                          const Text(
                             "More",
                             style: TextStyle(fontWeight: FontWeight.bold),
                           )
@@ -358,7 +385,8 @@ class homepage extends StatelessWidget {
             ),
             child: Column(
               children: [
-                Text(
+
+                const Text(
                   "Notice Board",
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -369,7 +397,7 @@ class homepage extends StatelessWidget {
                   width: MediaQuery.of(context).size.width,
                   height: 220,
                   padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(20),
@@ -377,9 +405,32 @@ class homepage extends StatelessWidget {
                         bottomLeft: Radius.circular(20),
                         bottomRight: Radius.circular(20)),
                   ),
-                  child: Center(child: Text("Today's notice here")),
+                  child: Center(
+                    child: StreamBuilder(
+                      stream: FirebaseFirestore.instance.collection('0001').doc('noticeboard').snapshots(),
+                      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                        if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        }
+
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        }
+
+                        if (!snapshot.hasData || snapshot.data!.data() == null) {
+                          return Text('No data available');
+                        }
+
+                        String textData = (snapshot.data!.data() as Map<String, dynamic>)['todays notice'] ?? 'No text found';
+
+                        return Text(
+                          textData,
+                          style: TextStyle(fontSize: 15,color: Colors.green),
+                        );
+                      },
+                    ),
                 ),
-              ],
+                ) ],
             ),
           ),
         ]),

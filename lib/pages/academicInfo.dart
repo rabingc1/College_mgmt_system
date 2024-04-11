@@ -1,11 +1,16 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:internship/model.dart';
 
-class academicinfo extends StatelessWidget {
-  const academicinfo({super.key});
+class academicinfo extends StatefulWidget {
+  const academicinfo({super.key, required List<imageModel> data});
 
   @override
+  State<academicinfo> createState() => _academicinfoState();
+}
+
+class _academicinfoState extends State<academicinfo> {
+  @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return const Placeholder();
   }
 }
