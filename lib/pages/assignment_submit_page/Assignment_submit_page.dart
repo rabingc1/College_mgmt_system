@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:internship/pages/assignment_submit_page/view_new_assignment.dart';
 import 'package:internship/pages/widget/button_widget.dart';
 import 'package:path/path.dart';
 
@@ -34,10 +35,6 @@ class _MainPageState extends State<Assignment_submit_page> {
       ),
       body: Column(
         children: [
-          Text("rabin"),
-
-
-
 
           Container(
 
@@ -65,6 +62,12 @@ class _MainPageState extends State<Assignment_submit_page> {
                     onClicked: uploadFile,
                   ),
                   SizedBox(height: 20),
+                  ElevatedButton( onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ViewNewAssignment()),
+                    );
+                  },child: Text("View New Assignment")),
                   task != null ? buildUploadStatus(task!) : Container(),
                 ],
               ),
@@ -74,6 +77,7 @@ class _MainPageState extends State<Assignment_submit_page> {
       ),
     );
   }
+
 
   Future selectFile() async {
     final result = await FilePicker.platform.pickFiles(allowMultiple: false);

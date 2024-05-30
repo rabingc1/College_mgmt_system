@@ -38,7 +38,7 @@ class more extends StatelessWidget {
                       // Navigate to the new page route when tapped
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => academicinfo(data: model,)),
+                        MaterialPageRoute(builder: (context) => AcademicInfoPage()),
                       );
                     },
                     child: Container(

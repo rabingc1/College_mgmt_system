@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:vibration/vibration.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../admin_pannel/log_in.dart';
 import '../fetchdata.dart';
 import '../model.dart';
 import '../user_auth/firebase_auth_services.dart';
@@ -78,7 +79,7 @@ class _signinState extends State<signin> {
                             children: [
                               Container(
                                   height: 80,
-                                  child: Text(
+                                  child: const Text(
                                     "Sign In",
                                     style: TextStyle(
                                         fontSize: 20,
@@ -143,7 +144,7 @@ class _signinState extends State<signin> {
                                 },
                                 child: _isLoading
                                     ? CircularProgressIndicator()
-                                    :Text('Submit'),
+                                    :const Text('Submit'),
                               ),
                               TextButton(
                                   onPressed: () {
@@ -186,11 +187,11 @@ class _signinState extends State<signin> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              fetchdata()),
+                                              LoginPage()),
                                     );
                                   },
                                   child: const Text(
-                                    "fetchdata",
+                                    "Admin Pannel",
                                     style: TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.bold,

@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
         initialRoute: '/', // Define initial route
         routes: {
           '/': (context) => first_Splash(), // Define home screen route
-          '/academicinfo': (context) => academicinfo(data: model,),
+          '/academicinfo': (context) => AcademicInfoPage(),
           '/Assignment': (context)  => LoadFirebaseStoragePdf(),
 
 

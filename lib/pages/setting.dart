@@ -14,6 +14,7 @@ import '../settingpage/User_information.dart';
 import '../settingpage/support_page.dart';
 import '../settingpage/terms_and_condition.dart';
 import 'ProfilePage.dart';
+import 'help_page.dart';
 
 class setting extends StatefulWidget {
   const setting({super.key});
@@ -200,7 +201,8 @@ return Scaffold(
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) =>
-                            homepage(data: model)),
+                            help()
+                        ),
                       );
                     }
                 ),

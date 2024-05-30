@@ -406,28 +406,31 @@ class _homepageState extends State<homepage> {
                         bottomRight: Radius.circular(20)),
                   ),
                   child: Center(
-                    child: StreamBuilder(
-                      stream: FirebaseFirestore.instance.collection('0001').doc('noticeboard').snapshots(),
-                      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                        if (snapshot.hasError) {
-                          return Text('Error: ${snapshot.error}');
-                        }
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: StreamBuilder(
+                        stream: FirebaseFirestore.instance.collection('0001').doc('noticeboard').snapshots(),
+                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                          if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          }
 
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        }
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          }
 
-                        if (!snapshot.hasData || snapshot.data!.data() == null) {
-                          return Text('No data available');
-                        }
+                          if (!snapshot.hasData || snapshot.data!.data() == null) {
+                            return Text('No data available');
+                          }
 
-                        String textData = (snapshot.data!.data() as Map<String, dynamic>)['todays notice'] ?? 'No text found';
+                          String textData = (snapshot.data!.data() as Map<String, dynamic>)['todays notice'] ?? 'No text found';
 
-                        return Text(
-                          textData,
-                          style: TextStyle(fontSize: 15,color: Colors.green),
-                        );
-                      },
+                          return Text(
+                            textData,
+                            style: TextStyle(fontSize: 15,color: Colors.green),
+                          );
+                        },
+                      ),
                     ),
                 ),
                 ) ],
