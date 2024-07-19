@@ -1,3 +1,4 @@
+/*
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -56,5 +57,155 @@ class SemesterSection extends StatelessWidget {
         ],
       ),
     );
+  }
+}*/
+
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
+class AcademicInfoPage extends StatefulWidget {
+  const AcademicInfoPage({super.key});
+
+  @override
+  State<AcademicInfoPage> createState() => _AcademicInfoPageState();
+}
+
+class _AcademicInfoPageState extends State<AcademicInfoPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Academic Info"),
+      ),
+      body: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Column(
+            children: [
+              DataTable(
+                columns: const [
+                  DataColumn(label: Text('Subject Code')),
+                  DataColumn(label: Text('Subject Name')),
+                  DataColumn(label: Text('Credit Hours')),
+                ],
+                rows: const [
+                  DataRow(cells: [
+                    DataCell(Text('CSC101')),
+                    DataCell(Text('Introduction to Programming')),
+                    DataCell(Text('3')),
+                  ]),
+                  DataRow(cells: [
+                    DataCell(Text('MTH101')),
+                    DataCell(Text('Calculus I')),
+                    DataCell(Text('4')),
+                  ]),
+                  DataRow(cells: [
+                    DataCell(Text('PHY101')),
+                    DataCell(Text('Physics I')),
+                    DataCell(Text('4')),
+                  ]),
+                  DataRow(cells: [
+                    DataCell(Text('ENG101')),
+                    DataCell(Text('English Composition')),
+                    DataCell(Text('3')),
+                  ]),
+                  DataRow(cells: [
+                    DataCell(Text('HIS101')),
+                    DataCell(Text('World History')),
+                    DataCell(Text('3')),
+                  ]),
+                  DataRow(cells: [
+                    DataCell(Text('CSC102')),
+                    DataCell(Text('Computer Science Seminar')),
+                    DataCell(Text('1')),
+                  ]),
+                ],
+              ),
+              DataTable(
+                columns: const [
+                  DataColumn(label: Text('Subject Code')),
+                  DataColumn(label: Text('Subject Name')),
+                  DataColumn(label: Text('Credit Hours')),
+                ],
+                rows: const [
+                  DataRow(cells: [
+                    DataCell(Text('CSC101')),
+                    DataCell(Text('Introduction to Programming')),
+                    DataCell(Text('3')),
+                  ]),
+                  DataRow(cells: [
+                    DataCell(Text('MTH101')),
+                    DataCell(Text('Calculus I')),
+                    DataCell(Text('4')),
+                  ]),
+                  DataRow(cells: [
+                    DataCell(Text('PHY101')),
+                    DataCell(Text('Physics I')),
+                    DataCell(Text('4')),
+                  ]),
+                  DataRow(cells: [
+                    DataCell(Text('ENG101')),
+                    DataCell(Text('English Composition')),
+                    DataCell(Text('3')),
+                  ]),
+                  DataRow(cells: [
+                    DataCell(Text('HIS101')),
+                    DataCell(Text('World History')),
+                    DataCell(Text('3')),
+                  ]),
+                  DataRow(cells: [
+                    DataCell(Text('CSC102')),
+                    DataCell(Text('Computer Science Seminar')),
+                    DataCell(Text('1')),
+                  ]),
+                ],
+              ),
+              DataTable(
+                columns: const [
+                  DataColumn(label: Text('Subject Code')),
+                  DataColumn(label: Text('Subject Name')),
+                  DataColumn(label: Text('Credit Hours')),
+                ],
+                rows: const [
+                  DataRow(cells: [
+                    DataCell(Text('CSC101')),
+                    DataCell(Text('Introduction to Programming')),
+                    DataCell(Text('3')),
+                  ]),
+                  DataRow(cells: [
+                    DataCell(Text('MTH101')),
+                    DataCell(Text('Calculus I')),
+                    DataCell(Text('4')),
+                  ]),
+                  DataRow(cells: [
+                    DataCell(Text('PHY101')),
+                    DataCell(Text('Physics I')),
+                    DataCell(Text('4')),
+                  ]),
+                  DataRow(cells: [
+                    DataCell(Text('ENG101')),
+                    DataCell(Text('English Composition')),
+                    DataCell(Text('3')),
+                  ]),
+                  DataRow(cells: [
+                    DataCell(Text('HIS101')),
+                    DataCell(Text('World History')),
+                    DataCell(Text('3')),
+                  ]),
+                  DataRow(cells: [
+                    DataCell(Text('CSC102')),
+                    DataCell(Text('Computer Science Seminar')),
+                    DataCell(Text('1')),
+                  ]),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+
+    );
+
   }
 }

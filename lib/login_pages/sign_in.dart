@@ -169,7 +169,7 @@ class _signinState extends State<signin> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              Userregistration(data: widget.data)),
+                                              UserRegistration(data: widget.data)),
                                     );
                                   },
                                   child: const Text(

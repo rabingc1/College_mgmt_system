@@ -116,7 +116,7 @@ class Signinandsignupmain extends StatelessWidget {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => Userregistration(data: [],)),
+                                        builder: (context) => UserRegistration(data: [],)),
                                   );
                                 },
                                 child: const Row(

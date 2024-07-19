@@ -1,103 +1,37 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class ProfilePage extends StatefulWidget {
-  final String userId;
-
-  const ProfilePage({Key? key, required this.userId}) : super(key: key);
-
+class SettingsPage extends StatefulWidget {
   @override
-  _ProfilePageState createState() => _ProfilePageState();
+  _SettingsPageState createState() => _SettingsPageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
-  File? _imageFile;
-  bool _uploading = false;
-  String? _profileImageUrl;
+class _SettingsPageState extends State<SettingsPage> {
+  User? currentUser;
+  Map<String, dynamic>? userData;
 
   @override
   void initState() {
     super.initState();
-    _fetchProfileImage();
-  }
-
-  Future<void> _fetchProfileImage() async {
-    try {
-      // Retrieve user document from Firestore
-      DocumentSnapshot<Map<String, dynamic>> userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(widget.userId)
-          .get();
-
-      // Get profile image URL from user document
-      if (userDoc.exists) {
-        setState(() {
-          _profileImageUrl = userDoc.data()?['profileImageUrl'];
-        });
-      }
-    } catch (e) {
-      print('Error fetching profile image: $e');
+    currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      _fetchUserData();
     }
   }
 
-  Future<void> _uploadImage(ImageSource source) async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: source);
-
-    if (pickedFile != null) {
+  Future<void> _fetchUserData() async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser!.uid)
+          .get();
       setState(() {
-        _imageFile = File(pickedFile.path);
-        _uploading = true;
+        userData = snapshot.data();
       });
-
-      try {
-        // Upload image to Firebase Storage
-        String fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
-        Reference firebaseStorageRef =
-        FirebaseStorage.instance.ref().child('profile_images/$fileName');
-        UploadTask uploadTask = firebaseStorageRef.putFile(_imageFile!);
-        TaskSnapshot taskSnapshot = await uploadTask;
-
-        if (taskSnapshot.state == TaskState.success) {
-          // Get download URL of uploaded image
-          final imageUrl = await taskSnapshot.ref.getDownloadURL();
-
-          // Update user document in Firestore with image URL
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(widget.userId)
-              .update({'profileImageUrl': imageUrl});
-
-          setState(() {
-            _profileImageUrl = imageUrl; // Update profile image URL
-          });
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Profile picture uploaded successfully'),
-              duration: Duration(seconds: 2),
-            ),
-          );
-        } else {
-          throw 'Image upload failed';
-        }
-      } catch (e) {
-        print('Image upload error: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to upload profile picture'),
-            duration: Duration(seconds: 5),
-          ),
-        );
-      } finally {
-        setState(() {
-          _uploading = false;
-        });
-      }
+    } catch (e) {
+      print('Error fetching user data: $e');
     }
   }
 
@@ -105,34 +39,119 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profile'),
+        title: Text('Settings'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-          /*  CircleAvatar(
-              radius: 80,
-              backgroundImage: _profileImageUrl != null
-                  ? NetworkImage(_profileImageUrl!)
-                  : (_imageFile != null ? FileImage(_imageFile!) : null),
-              child: (_profileImageUrl == null && _imageFile == null)
-                  ? Icon(Icons.person, size: 80)
-                  : null,
-            ),*/
-            SizedBox(height: 20),
+      body: userData == null
+          ? Center(child: CircularProgressIndicator())
+          : ListView(
+        padding: EdgeInsets.all(16.0),
+        children: [
+          // Profile Picture
+          CircleAvatar(
+            backgroundImage: userData!['profileImage'] != null
+                ? NetworkImage(userData!['profileImage'])
+                : null,
+            child: userData!['profileImage'] == null
+                ? Icon(
+              Icons.person,
+              size: 40,
+            )
+                : null,
+            radius: 40,
+          ),
+          SizedBox(height: 16),
+          // Name
+          Center(
+            child: Text(
+              userData!['name'] ?? 'N/A',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ),
+          SizedBox(height: 4),
+          // Email
+          Center(
+            child: Text(
+              userData!['email'] ?? 'N/A',
+              style: TextStyle(color: Colors.grey),
+            ),
+          ),
+          SizedBox(height: 20),
+          // Other user details
+          Card(
+            child: ListTile(
+              title: Text('Address'),
+              subtitle: Text(userData!['address'] ?? 'N/A'),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              title: Text('Phone Number'),
+              subtitle: Text(userData!['phoneNumber'] ?? 'N/A'),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              title: Text('Symbol Number'),
+              subtitle: Text(userData!['symbolNumber'] ?? 'N/A'),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              title: Text('Semester'),
+              subtitle: Text(userData!['semester'] ?? 'N/A'),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              title: Text('Guardian Phone Number'),
+              subtitle: Text(userData!['guardianPhoneNumber'] ?? 'N/A'),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              title: Text('Faculty'),
+              subtitle: Text(userData!['faculty'] ?? 'N/A'),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              title: Text('Documents'),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: (userData!['academicDocument'] is List<dynamic>)
+                    ? (userData!['academicDocument'] as List<dynamic>)
+                    .map((doc) => Text(doc.toString()))
+                    .toList()
+                    : [Text(userData!['academicDocument'].toString())],
+              ),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              title: Text('Documents'),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: (userData!['academicDocument'] is List<dynamic>)
+                    ? (userData!['academicDocument'] as List<dynamic>)
+                    .map((doc) => ElevatedButton(
+                  onPressed: () async {
+                    final Uri url = Uri.parse(doc.toString());
+                    if (await canLaunch(url.toString())) {
+                      await launch(url.toString());
+                    } else {
+                      throw 'Could not launch $url';
+                    }
+                  },
+                  child: Text('View Document'),
+                ))
+                    .toList()
+                    : [Text(userData!['academicDocument'].toString())],
+              ),
+            ),
+          ),
 
-            ElevatedButton(
-              onPressed: _uploading ? null : () => _uploadImage(ImageSource.gallery),
-              child: _uploading ? CircularProgressIndicator() : Text('Upload from Gallery'),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _uploading ? null : () => _uploadImage(ImageSource.camera),
-              child: _uploading ? CircularProgressIndicator() : Text('Take a Photo'),
-            ),
-          ],
-        ),
+
+        ],
       ),
     );
   }

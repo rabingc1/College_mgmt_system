@@ -28,7 +28,7 @@ class _AdminNoticeboardState extends State<AdminNoticeboard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               "Notice Board",
               style: TextStyle(
                 fontWeight: FontWeight.bold,

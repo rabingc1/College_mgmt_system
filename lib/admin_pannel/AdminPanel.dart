@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'admin_pages/admin_assigment_view.dart';
 import 'admin_pages/admin_noticeboard.dart';
 import 'admin_pages/admin_useraccounts.dart';
+import 'admin_pages/chattigpage.dart';
+import 'admin_pages/event_update_admin.dart';
 import 'admin_pages/upload_asignment_admin.dart';
 
 class AdminPanel extends StatelessWidget {
@@ -35,23 +37,23 @@ class AdminPanel extends StatelessWidget {
                     'Submitted Assignment ',
                     Icons.view_list,
                     Colors.blue,
-                        () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => AssignmentView()
-                              )  );
-                         },
+                    () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AssignmentView()));
+                    },
                   ),
                   _buildGridItem(
                     context,
                     'Upload Assignment',
                     Icons.upload_file,
                     Colors.green,
-                        () {
+                    () {
                       Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => UploadAssignmentPage()
-                          )  );
+                          MaterialPageRoute(
+                              builder: (context) => UploadAssignmentPage()));
                     },
                   ),
                   _buildGridItem(
@@ -59,11 +61,11 @@ class AdminPanel extends StatelessWidget {
                     'Notice Board',
                     Icons.notifications,
                     Colors.orange,
-                        () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => AdminNoticeboard()
-                            )  );
+                    () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AdminNoticeboard()));
                     },
                   ),
                   _buildGridItem(
@@ -71,7 +73,7 @@ class AdminPanel extends StatelessWidget {
                     'Upload Notice Board',
                     Icons.upload_rounded,
                     Colors.purple,
-                        () {
+                    () {
                       // Navigate to Upload Notice Board page
                       print('Navigate to Upload Notice Board');
                     },
@@ -81,11 +83,11 @@ class AdminPanel extends StatelessWidget {
                     'User',
                     Icons.person,
                     Colors.red,
-                        () {
+                    () {
                       Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => adminuseraccount()
-                            )  );
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => UserListPage()));
                       // Navigate to User page
                       print('Navigate to User');
                     },
@@ -95,9 +97,33 @@ class AdminPanel extends StatelessWidget {
                     'Result',
                     Icons.assessment,
                     Colors.brown,
-                        () {
+                    () {
                       // Navigate to Result page
                       print('Navigate to Result');
+                    },
+                  ),
+                  _buildGridItem(
+                    context,
+                    'Chat Box ',
+                    Icons.mark_unread_chat_alt_sharp,
+                    Colors.blue,
+                    () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AdminChatPage()));
+                    },
+                  ),
+                  _buildGridItem(
+                    context,
+                    'Event Update ',
+                    Icons.event,
+                    Colors.blue,
+                        () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>  EventListPage()));
                     },
                   ),
                 ],
@@ -109,8 +135,8 @@ class AdminPanel extends StatelessWidget {
     );
   }
 
-  Widget _buildGridItem(
-      BuildContext context, String title, IconData icon, Color color, VoidCallback onTap) {
+  Widget _buildGridItem(BuildContext context, String title, IconData icon,
+      Color color, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(

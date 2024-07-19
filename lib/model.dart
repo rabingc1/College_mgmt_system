@@ -18,7 +18,7 @@ List<imageModel> model = [
 
   imageModel(image: "images/attendance.png", Name: "attendance"),//10
   imageModel(image: "images/settings.png", Name: "setting"),    //11
-  imageModel(image: "images/signup.png", Name: "Signup")//12
+  imageModel(image: "images/backpic.jpg", Name: "backpic")//12
 
 
 

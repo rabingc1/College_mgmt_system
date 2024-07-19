@@ -136,28 +136,12 @@ return Scaffold(
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) =>
-                            ProfilePage( userId: '',)),
+                            SettingsPage()),
                       );
                     }
                 ),
 
-                ListTile(
-                    leading: const Icon(
-                      Icons.perm_device_information,
-                      size: 35,
 
-                    ),
-                    title: Text(
-                      "Information", style: TextStyle(fontSize: 20,),),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) =>
-
-                          userinformation()),
-                      );
-                    }
-                ),
                 ListTile(
                     leading: const Icon(
                       Icons.rule,
@@ -200,8 +184,7 @@ return Scaffold(
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) =>
-                            help()
+                        MaterialPageRoute(builder: (context) => help()
                         ),
                       );
                     }

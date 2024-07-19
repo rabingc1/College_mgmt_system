@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:internship/pages/setting.dart';
 
 import '../model.dart';
+import '../settingpage/AttendanceSessionScreen.dart';
 import '../settingpage/form.dart';
 import 'academicInfo.dart';
 import 'assignment.dart';
@@ -114,7 +115,7 @@ class more extends StatelessWidget {
                       // Navigate to the new page route when tapped
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => event()),
+                        MaterialPageRoute(builder: (context) => const EventPage()),
                       );
                     },
                     child: Container(// this is fro event--------------------------------------------------------
@@ -227,7 +228,7 @@ class more extends StatelessWidget {
                       // Navigate to the new page route when tapped
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => FormScreen(data: model)),
+                        MaterialPageRoute(builder: (context) => AttendanceSessionScreen()),
                       );
                     },
                     child: Container(// this is for Result--------------------------------------------------------------------------------------
