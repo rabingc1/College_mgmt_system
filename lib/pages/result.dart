@@ -1,35 +1,44 @@
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:internship/pages/setting.dart';
+import 'package:flutter/material.dart';
 
-class result extends StatefulWidget {
+class ResultSearchPage extends StatefulWidget {
   @override
-  _FetchDataState createState() => _FetchDataState();
+  _ResultSearchPageState createState() => _ResultSearchPageState();
 }
 
-class _FetchDataState extends State<result> {
-  late User _user; // Firebase user object
-  late Stream<QuerySnapshot<Map<String, dynamic>>> _resultStream; // Firestore collection stream
+class _ResultSearchPageState extends State<ResultSearchPage> {
+  final TextEditingController _symbolNumberController = TextEditingController();
+  Map<String, dynamic>? _resultData;
+  bool _isLoading = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _initializeUser(); // Initialize Firebase user
-  }
+  Future<void> _fetchResult() async {
+    setState(() {
+      _isLoading = true;
+      _resultData = null;
+    });
 
-  Future<void> _initializeUser() async {
-    _user = FirebaseAuth.instance.currentUser!;
-    if (_user != null) {
-      _resultStream = FirebaseFirestore.instance
-          .collection('users')
-          .doc(_user.uid)
-          .collection('result')
-          .snapshots();
-    } else {
-      // Handle authentication issue (user not logged in)
-      // For example, navigate to login screen
-      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+    try {
+      String symbolNumber = _symbolNumberController.text.trim();
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('students')
+          .doc(symbolNumber)
+          .get();
+
+      if (doc.exists) {
+        setState(() {
+          _resultData = doc.data() as Map<String, dynamic>?;
+        });
+      } else {
+        setState(() {
+          _resultData = null;
+        });
+      }
+    } catch (e) {
+      print('Error fetching result: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -37,83 +46,122 @@ class _FetchDataState extends State<result> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Academic Results'),
+        title: Text('Search Results'),
       ),
-      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: _resultStream,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text('No data available'));
-          }
-
-          // Retrieve result data from Firestore documents
-          return ListView.builder(
-            itemCount: snapshot.data!.docs.length,
-            itemBuilder: (context, index) {
-              DocumentSnapshot<Map<String, dynamic>> document = snapshot.data!.docs[index];
-              Map<String, dynamic>? resultData = document.data();
-
-              if (resultData == null) {
-                return SizedBox(); // Handle case where resultData is null
-              }
-
-              String subject = resultData['semester'] ?? 'N/A'; // Use default value if 'subject' is null
-              dynamic? score = resultData['cgpa'] as dynamic?; // Use int? to allow for null 'score'
-
-              return Card(
-
-                shadowColor: Colors.red,
-                elevation: 2,
-                margin: EdgeInsets.symmetric(vertical: 15,horizontal: 20),
-                child: GestureDetector(
-                  onTap:(){
-                    showModalBottomSheet<void>(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return Container(
-                          height: 150,
-                          color: Colors.black,
-                          child: Column(
-                            children: [
-                              Container(
-
-                                padding: EdgeInsets.only(left: 350,top: 0,bottom: 0),
-                                child: IconButton(
-                                iconSize: 40,
-                                  color: Colors.white,
-                                  onPressed: () => Navigator.pop(context),  icon: new Icon(Icons.cancel_outlined),),
-                              ),
-                              Center(child: const Text('Sorry!! Grade Sheet is not avaiable ',style: TextStyle(color: Colors.white),)),
-                            ],
-                          ),
-                        );
-                      },
-                    );
-                  },
-                  child: ListTile(
-                    iconColor: Colors.green,
-                    title: Text('Semester: $subject', style: TextStyle(fontSize: 18)),
-                    subtitle: Text('CGPA: ${score ?? 'N/A'}', style: TextStyle(fontSize: 16)),
-                    trailing: const Column(
-                        children: <Widget>[
-                          Icon(Icons.file_copy_rounded),
-
-                        ]),
-                  ),
-                ),
-              );
-            },
-          );
-        },
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _symbolNumberController,
+              decoration: InputDecoration(
+                labelText: 'Enter Symbol Number',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _fetchResult,
+              child: Text('Search'),
+            ),
+            SizedBox(height: 20),
+            if (_isLoading)
+              CircularProgressIndicator()
+            else if (_resultData != null)
+              ResultDisplay(resultData: _resultData!)
+            else if (_resultData == null && _symbolNumberController.text.isNotEmpty)
+                Text('No results found for the entered symbol number.'),
+          ],
+        ),
       ),
     );
   }
 }
+
+
+
+class ResultDisplay extends StatelessWidget {
+  final Map<String, dynamic> resultData;
+
+  ResultDisplay({required this.resultData});
+
+  String calculateGrade(double percentage) {
+    if (percentage >= 90) return 'A+';
+    if (percentage >= 80) return 'A';
+    if (percentage >= 70) return 'B+';
+    if (percentage >= 60) return 'B';
+    if (percentage >= 50) return 'C+';
+    return 'Fail';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Map<String, dynamic> subjects = resultData['subjects'] as Map<String, dynamic>;
+    double totalMarks = 500.0; // Fixed total marks
+    double totalObtainedMarks = 0;
+    bool hasFailed = false;
+
+    List<Widget> subjectWidgets = [];
+    subjects.forEach((subject, marks) {
+      double marksValue = marks?.toDouble() ?? 0.0;
+      totalObtainedMarks += marksValue;
+
+      // Check if individual subject marks are below 50
+      if (marksValue < 50) {
+        hasFailed = true;
+      }
+
+      subjectWidgets.add(
+        ListTile(
+          title: Text(subject),
+          trailing: Text(marksValue.toString()),
+        ),
+      );
+    });
+
+    // Calculate percentage
+    double percentage = totalMarks > 0 ? (totalObtainedMarks / totalMarks) * 100 : 0;
+    String grade = hasFailed ? 'Fail' : calculateGrade(percentage);
+
+    return Expanded(
+      child: Card(
+        child: ListView(
+          children: [
+            ListTile(
+              title: Text('Full Name'),
+              subtitle: Text(resultData['fullName'] ?? 'N/A'),
+            ),
+            ListTile(
+              title: Text('Faculty'),
+              subtitle: Text(resultData['faculty'] ?? 'N/A'),
+            ),
+            ListTile(
+              title: Text('Semester'),
+              subtitle: Text(resultData['semester'] ?? 'N/A'),
+            ),
+            Divider(),
+            ...subjectWidgets,
+            Divider(),
+            ListTile(
+              title: Text('Total FM'),
+              trailing: Text(totalMarks.toStringAsFixed(2)),
+            ),
+            ListTile(
+              title: Text('Obtained Marks'),
+              trailing: Text(totalObtainedMarks.toStringAsFixed(2)),
+            ),
+            ListTile(
+              title: Text('Percentage'),
+              trailing: Text(percentage.toStringAsFixed(2)),
+            ),
+            ListTile(
+              title: Text('Grade'),
+              trailing: Text(grade),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+

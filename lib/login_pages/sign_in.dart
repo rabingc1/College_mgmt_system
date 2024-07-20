@@ -32,6 +32,14 @@ class _signinState extends State<signin> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _rememberMe = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserCredentials();
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -39,6 +47,16 @@ class _signinState extends State<signin> {
     super.dispose();
   }
 
+  void _loadUserCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _rememberMe = prefs.getBool('remember_me') ?? false;
+      if (_rememberMe) {
+        _emailController.text = prefs.getString('email') ?? '';
+        _passwordController.text = prefs.getString('password') ?? '';
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +85,6 @@ class _signinState extends State<signin> {
                 ),
                 child: Column(
                   children: [
-      
                     SafeArea(
                       child: Padding(
                         padding: const EdgeInsets.only(
@@ -106,7 +123,7 @@ class _signinState extends State<signin> {
                                 },
                                 onSaved: (value) {},
                               ),
-                              Text(""),
+                              const SizedBox(height: 10),
                               TextFormField(
                                 controller: _passwordController,
                                 decoration: const InputDecoration(
@@ -118,24 +135,38 @@ class _signinState extends State<signin> {
                                   if (value == null || value.isEmpty) {
                                     return 'Please enter your password';
                                   }
-                                  if (value.length < 7) {
+                                  if (value.length < 6) {
                                     return 'Password must be at least 6 characters';
                                   }
                                   return null;
                                 },
+                                obscureText: true,
                                 onSaved: (value) {},
                               ),
-                              Text(""),
-      
+                              const SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+
+                                  Checkbox(
+                                    value: _rememberMe,
+                                    onChanged: (bool? value) {
+                                      setState(() {
+                                        _rememberMe = value ?? false;
+                                      });
+                                    },
+                                  ),
+                                  Text('Remember Me'),
+                                ],
+                              ),
                               ElevatedButton(
                                 onPressed: () {
-                                 _signin(context);
-      
+                                  _signin(context);
+
                                   if (_formKey.currentState!.validate()) {
                                     _formKey.currentState!.save();
                                     // Form is validated, do something with the data
                                     print('Form validated');
-      
                                     // Navigate to the next page here
                                   } else {
                                     // Form validation failed
@@ -144,7 +175,7 @@ class _signinState extends State<signin> {
                                 },
                                 child: _isLoading
                                     ? CircularProgressIndicator()
-                                    :const Text('Submit'),
+                                    : const Text('Submit'),
                               ),
                               TextButton(
                                   onPressed: () {
@@ -162,7 +193,6 @@ class _signinState extends State<signin> {
                                         fontWeight: FontWeight.bold,
                                         decoration: TextDecoration.underline),
                                   )),
-
                               TextButton(
                                   onPressed: () {
                                     Navigator.push(
@@ -179,8 +209,6 @@ class _signinState extends State<signin> {
                                         fontWeight: FontWeight.bold,
                                         decoration: TextDecoration.underline),
                                   )),
-
-
                               TextButton(
                                   onPressed: () {
                                     Navigator.push(
@@ -197,8 +225,6 @@ class _signinState extends State<signin> {
                                         fontWeight: FontWeight.bold,
                                         decoration: TextDecoration.underline),
                                   )),
-
-
                             ],
                           ),
                         ),
@@ -224,12 +250,22 @@ class _signinState extends State<signin> {
 
     try {
       UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithEmailAndPassword(
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('tempEmail', email);
+
+      if (_rememberMe) {
+        prefs.setString('email', email);
+        prefs.setString('password', password);
+        prefs.setBool('remember_me', true);
+      } else {
+        prefs.remove('email');
+        prefs.remove('password');
+        prefs.setBool('remember_me', false);
+      }
 
       if (userCredential.user != null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -248,9 +284,8 @@ class _signinState extends State<signin> {
                   data: model)), // Assuming 'Signin' is your destination screen
         );
       } else {
-
+        print("failed");
       }
-      print("failed");
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -268,7 +303,9 @@ class _signinState extends State<signin> {
       // Handle sign-in errors here
     }
 
-
+    setState(() {
+      _isLoading = false; // Set loading state to false
+    });
   }
 }
 

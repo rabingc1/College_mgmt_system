@@ -78,7 +78,7 @@ class more extends StatelessWidget {
                       // Navigate to the new page route when tapped
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => result()),
+                        MaterialPageRoute(builder: (context) => ResultDisplay(resultData: {},)),
                       );
                     },
                     child: Container(// this is for Assignment---------------------------------------------------------------------------------
@@ -190,7 +190,7 @@ class more extends StatelessWidget {
                       // Navigate to the new page route when tapped
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => result()),
+                        MaterialPageRoute(builder: (context) => ResultDisplay(resultData: {},)),
                       );
                     },
                     child: Container(// this is for Result--------------------------------------------------------------------------------------

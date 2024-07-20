@@ -58,7 +58,7 @@ class _ChatPageState extends State<ChatPage> {
     final timeString = "${timestamp.hour}:${timestamp.minute}";
 
     return Align(
-      alignment: isStudent ? Alignment.centerLeft : Alignment.centerRight,
+      alignment: isStudent ? Alignment.centerRight : Alignment.centerLeft,
       child: GestureDetector(
         onLongPress: () {
           if (isStudent) {

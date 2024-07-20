@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'admin_pages/ResultPageAdmin.dart';
 import 'admin_pages/admin_assigment_view.dart';
 import 'admin_pages/admin_noticeboard.dart';
 import 'admin_pages/admin_useraccounts.dart';
@@ -98,7 +99,10 @@ class AdminPanel extends StatelessWidget {
                     Icons.assessment,
                     Colors.brown,
                     () {
-                      // Navigate to Result page
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ResultPage()));
                       print('Navigate to Result');
                     },
                   ),

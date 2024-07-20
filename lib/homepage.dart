@@ -276,7 +276,7 @@ class _homepageState extends State<homepage> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => result()),
+                          MaterialPageRoute(builder: (context) => ResultSearchPage()),
                         );
                       },
                       child: Container(
